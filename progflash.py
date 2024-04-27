@@ -73,13 +73,13 @@ GPIO.setup(cspin, GPIO.OUT)
 value = spicmd(0xAB, 8, 64, 0.5)
 
 if((value & 0xff) != ((value >> 8)& 0xff)):
-        print "Chip ID read didn't go well"
+        print ("Chip ID read didn't go well")
 
 id = value & 0xff
-print "ID ", format(id, '02x')
+print ("ID ", format(id, '02x'))
 
-if((id < 0x01) or (id > 0x20)):
-    print "ID is suspect, perhaps comms not working?" 
+if((id < 0x01) or (id > 0x40)):
+    print ("ID is suspect, perhaps comms not working?")
 
 time.sleep(0.5)
 
@@ -88,40 +88,41 @@ result = spicmd(0x06, 8, 0)
 
 # read the status register
 sreg1 = spicmd(0x05, 8, 8)  
-print "Status 1 ", format(sreg1, '02x')
+print ("Status 1 ", format(sreg1, '02x'))
 
 if((sreg1 & 0x02) == 0):
-    print "Write enable didn't work"
+    print ("Write enable didn't work")
 
-sreg2 = spicmd(0x35, 8, 8)  
-print "Status 2 ", format(sreg2, '02x')
+sreg2 = spicmd(0x15, 8, 8)  
+print ("Status 2 ", format(sreg2, '02x'))
 
 #verify
-sreg2b = spicmd(0x35, 8, 8)  
+sreg2b = spicmd(0x15, 8, 8)  
 if(sreg2 != sreg2b):
-    print "Veritication of status2 register failed!"
-    print "Status 2 ", format(sreg2b, '02x')
+    print ("Veritication of status2 register failed!")
+    print ("Status 2 ", format(sreg2b, '02x'))
 
 
 #send cmd
 #8 bits instruction
 #next 8 bits sreg 1
 #then 8 bits sreg2 with QE masked out
-cmd = (0x01 << 16) | (sreg1 << 8) | (sreg2 & 0xFD)
+#cmd = (0x01 << 16) | (sreg1 << 8) | (sreg2 & 0xFD)
+cmd = (0x01 << 16) | ((sreg1|0x40) << 8) | (sreg2)
 result = spicmd(cmd, 24, 0)
 
 #wait for the flash write to happen
 time.sleep(0.5)
 
 #verify the write
-verify = spicmd(0x35, 8, 8)
-print "Status 2 now ", format(verify, '02x')
+verify = spicmd(0x5, 8, 8)
+print ("Status 1 now ", format(verify, '02x'))
 
-if(verify & 0x02):
-    print "Readback of status2 register failed! If you have HOLD connected to CS this is normal."
+if(verify & 0x40):
+    print ("Readback of status register correct. QE enabled!")
 
 
 # hang out and do nothing for a half second
 time.sleep(0.5)
 GPIO.cleanup()
-print "Done!"
+print ("Done!")
