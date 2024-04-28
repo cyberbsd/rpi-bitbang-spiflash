@@ -85,7 +85,7 @@ time.sleep(0.5)
 
 # read the status register
 jdec1 = spicmd(0x9F, 8, 24)  
-print "JDEC ID ", format(jdec1, '06x')
+print ("JDEC ID ", format(jdec1, '06x'))
 
 #send power down cmd
 #8 bits instruction
@@ -96,14 +96,14 @@ time.sleep(1)
 
 #verify the write
 jdec2 = spicmd(0x9F, 8, 24)  
-print "JDEC ID Now ", format(jdec2, '06x')
+print ("JDEC ID Now ", format(jdec2, '06x'))
 
 if(0xffffff == jdec2 or 0x000000 == jdec2):
-    print "Flash looks asleep."
+    print ("Flash looks asleep.")
 else:
-    print "Flash doesnt look asleep"
+    print ("Flash doesnt look asleep")
 
 # hang out and do nothing for a half second
 time.sleep(0.5)
 GPIO.cleanup()
-print "Done!"
+print ("Done!")

@@ -108,6 +108,7 @@ if(sreg2 != sreg2b):
 #next 8 bits sreg 1
 #then 8 bits sreg2 with QE masked out
 #cmd = (0x01 << 16) | (sreg1 << 8) | (sreg2 & 0xFD)
+#cmd = (0x01 << 16) | ((sreg1 & 0xBF) << 8) | (sreg2 & 0xFD)
 cmd = (0x01 << 16) | ((sreg1|0x40) << 8) | (sreg2)
 result = spicmd(cmd, 24, 0)
 
@@ -120,6 +121,8 @@ print ("Status 1 now ", format(verify, '02x'))
 
 if(verify & 0x40):
     print ("Readback of status register correct. QE enabled!")
+else:
+    print ("QE disabled!")
 
 
 # hang out and do nothing for a half second
